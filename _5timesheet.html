@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Timesheet — Bishman Electrical</title>
+<style>
+  :root {
+    --navy: #0d2c54;
+    --blue: #1565c0;
+    --blue-light: #e8f0fe;
+    --accent: #f57c00;
+    --green: #2e7d32;
+    --green-light: #e8f5e9;
+    --red: #c62828;
+    --red-light: #ffebee;
+    --amber-light: #fff8e1;
+    --gray-50: #f8f9fa;
+    --gray-100: #f1f3f4;
+    --gray-200: #e8eaed;
+    --gray-300: #dadce0;
+    --gray-500: #80868b;
+    --gray-700: #5f6368;
+    --gray-900: #202124;
+    --white: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .app-header {
+    background: var(--navy);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: white; letter-spacing: -1px;
+  }
+  .brand-text h1 { font-size: 16px; font-weight: 700; letter-spacing: 0.3px; }
+  .brand-text p  { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+  .header-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .progress-bar  { height: 3px; background: rgba(255,255,255,0.15); }
+  .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+
+  .card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+  .card-header {
+    background: var(--navy);
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .card-header .icon {
+    width: 22px; height: 22px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .card-header.blue-header   { background: var(--blue); }
+  .card-header.green-header  { background: var(--green); }
+  .card-header.dark-header   { background: #37474f; }
+  .card-body { padding: 20px; }
+
+  .field-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 11px; font-weight: 600; color: var(--gray-700);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  .field input, .field select, .field textarea {
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 14px; font-family: inherit;
+    color: var(--gray-900); background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(21,101,192,0.1);
+  }
+  .field input.error { border-color: var(--red); }
+  .field input[readonly] { background: var(--gray-50); color: var(--gray-700); cursor: default; }
+  .field textarea { resize: vertical; min-height: 72px; }
+  .field select { cursor: pointer; }
+
+  .combo-wrap { position: relative; }
+  .combo-wrap input { padding-right: 36px; }
+  .combo-arrow {
+    position: absolute; right: 11px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500); font-size: 11px;
+    pointer-events: none; transition: transform 0.2s;
+  }
+  .combo-arrow.open { transform: translateY(-50%) rotate(180deg); }
+  .combo-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: white; border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius); box-shadow: var(--shadow-md);
+    z-index: 200; display: none; max-height: 200px; overflow-y: auto;
+  }
+  .combo-dropdown.open { display: block; }
+  .combo-item {
+    padding: 9px 14px; font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; transition: background 0.12s;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .combo-item:last-child { border-bottom: none; }
+  .combo-item:hover { background: var(--blue-light); color: var(--blue); }
+  .combo-item .ci-name { font-weight: 600; }
+  .combo-item .ci-role { font-size: 11px; color: var(--gray-500); }
+  .combo-item:hover .ci-role { color: var(--blue); opacity: 0.7; }
+  .combo-no-results {
+    padding: 10px 14px; font-size: 12px; color: var(--gray-500);
+    font-style: italic; text-align: center;
+  }
+
+  .mgr-selected-badge {
+    display: none; align-items: center; gap: 8px;
+    background: var(--blue-light); border: 1px solid #90caf9;
+    border-radius: var(--radius); padding: 7px 12px; font-size: 12px; margin-top: 5px;
+  }
+  .mgr-selected-badge.show { display: flex; }
+  .mgr-badge-name { font-weight: 700; color: var(--blue); }
+  .mgr-badge-role { color: var(--gray-500); font-size: 11px; }
+  .mgr-badge-clear {
+    margin-left: auto; background: none; border: none;
+    color: var(--gray-500); cursor: pointer; font-size: 14px; line-height: 1;
+    padding: 0 2px; transition: color 0.15s;
+  }
+  .mgr-badge-clear:hover { color: var(--red); }
+
+  .table-wrap { overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
+  .time-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+  .time-table thead tr { background: var(--blue-light); }
+  .time-table thead th {
+    padding: 8px 6px; text-align: center; font-weight: 700; font-size: 11px;
+    letter-spacing: 0.4px; color: var(--blue); text-transform: uppercase;
+    border-bottom: 2px solid var(--blue); white-space: nowrap;
+  }
+  .time-table thead th:first-child { text-align: left; padding-left: 10px; }
+  .time-table tbody tr { border-bottom: 1px solid var(--gray-200); }
+  .time-table tbody tr:hover { background: var(--gray-50); }
+  .time-table tbody tr.leave-row { background: var(--amber-light); }
+  .time-table tbody tr.leave-row:hover { background: #fff3cd; }
+  .time-table tbody tr.totals-row { background: var(--navy); color: white; font-weight: 700; }
+  .time-table tbody tr.totals-row td { padding: 10px 6px; }
+  .time-table td { padding: 6px 4px; text-align: center; vertical-align: middle; }
+  .time-table td:first-child { text-align: left; padding-left: 10px; font-weight: 500; min-width: 170px; }
+  .time-table td.row-label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+  .time-table td.row-label.leave-label { color: var(--accent); }
+
+  .hour-input {
+    width: 50px; border: 1.5px solid var(--gray-300); border-radius: 5px;
+    padding: 5px 4px; text-align: center; font-size: 13px;
+    font-family: 'Courier New', monospace; font-weight: 600;
+    color: var(--gray-900); background: white;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .hour-input:focus { outline: none; border-color: var(--blue); background: var(--blue-light); }
+  .hour-input.overtime { color: var(--red); background: var(--red-light); border-color: #ef9a9a; }
+  .hour-input:disabled { background: var(--gray-100); color: var(--gray-500); }
+
+  .job-input {
+    width: 100%; border: 1.5px solid var(--gray-300); border-radius: 5px;
+    padding: 5px 8px; font-size: 12px; font-family: inherit; transition: border-color 0.2s;
+  }
+  .job-input:focus { outline: none; border-color: var(--blue); }
+  .row-total { font-weight: 700; font-size: 14px; color: var(--navy); min-width: 40px; }
+  .row-total.overtime-val { color: var(--red); }
+
+  .add-row-btn {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 12px; padding: 8px 14px;
+    background: white; border: 1.5px dashed var(--gray-300);
+    border-radius: var(--radius); color: var(--blue); font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .add-row-btn:hover { border-color: var(--blue); background: var(--blue-light); }
+
+  .totals-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-top: 4px;
+  }
+  .total-card { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 14px; text-align: center; }
+  .total-card.highlight { background: var(--navy); border-color: var(--navy); color: white; }
+  .total-card.overtime  { background: var(--red-light); border-color: #ef9a9a; }
+  .total-card.ordinary  { background: var(--green-light); border-color: #a5d6a7; }
+  .total-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gray-500); margin-bottom: 6px; }
+  .total-card.highlight .total-card-label { color: rgba(255,255,255,0.7); }
+  .total-card.overtime  .total-card-label { color: var(--red); }
+  .total-card.ordinary  .total-card-label { color: var(--green); }
+  .total-card-value { font-size: 28px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .total-card.highlight .total-card-value { color: white; }
+  .total-card.overtime  .total-card-value { color: var(--red); }
+  .total-card.ordinary  .total-card-value { color: var(--green); }
+  .total-card-sub { font-size: 11px; color: var(--gray-500); margin-top: 3px; }
+  .total-card.highlight .total-card-sub { color: rgba(255,255,255,0.6); }
+
+  .ot-alert {
+    display: none; background: var(--red-light); border: 1px solid #ef9a9a;
+    border-radius: var(--radius); padding: 12px 16px; margin-top: 12px;
+    font-size: 13px; color: var(--red); font-weight: 500;
+  }
+  .ot-alert.visible { display: flex; align-items: center; gap: 8px; }
+
+  .sick-options { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .sick-opt {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    padding: 8px 14px; cursor: pointer; font-size: 13px;
+    transition: all 0.2s; background: white;
+  }
+  .sick-opt:hover { border-color: var(--accent); }
+  .sick-opt.selected { border-color: var(--accent); background: var(--amber-light); font-weight: 600; }
+  .sick-opt input { accent-color: var(--accent); }
+
+  .sig-wrap {
+    border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    overflow: hidden; background: var(--gray-50); position: relative;
+    transition: border-color 0.3s;
+  }
+  .sig-wrap.has-sig { border-color: var(--green); }
+  .sig-canvas { display: block; width: 100%; height: 110px; cursor: crosshair; touch-action: none; }
+  .sig-placeholder {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    color: var(--gray-300); font-size: 13px; pointer-events: none; text-align: center;
+  }
+  .sig-clear {
+    display: block; width: 100%; padding: 6px; background: none; border: none;
+    border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 12px;
+    cursor: pointer; text-align: center; transition: background 0.2s;
+  }
+  .sig-clear:hover { background: var(--gray-100); color: var(--red); }
+
+  .sig-required-note {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--amber-light); border: 1px solid #ffe082;
+    border-radius: var(--radius); padding: 10px 14px; font-size: 12px;
+    color: #6d4c00; font-weight: 500; margin-top: 8px; transition: opacity 0.3s;
+  }
+  .sig-required-note.hidden { opacity: 0; pointer-events: none; }
+
+  .office-section { display: flex; flex-direction: column; gap: 16px; }
+  .office-codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+  .office-field { display: flex; flex-direction: column; gap: 4px; }
+  .office-field label { font-size: 11px; font-weight: 700; color: var(--gray-700); letter-spacing: 0.4px; }
+  .office-field input, .office-field select {
+    border: 1.5px solid var(--gray-300); border-radius: 5px;
+    padding: 7px 10px; font-size: 13px; font-family: inherit; width: 100%;
+    background: white; transition: border-color 0.2s;
+  }
+  .office-field input:focus, .office-field select:focus { outline: none; border-color: var(--blue); }
+  .office-field input[readonly] { background: var(--gray-50); color: var(--gray-700); }
+
+  .approval-row { display: grid; grid-template-columns: 180px 1fr; gap: 12px; align-items: start; }
+  .approval-status-group { display: flex; flex-direction: column; gap: 6px; }
+  .approval-status-group label { font-size: 11px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.4px; }
+  #approvalStatus {
+    border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    padding: 9px 12px; font-size: 13px; font-family: inherit;
+    cursor: pointer; background: white; width: 100%; transition: border-color 0.2s;
+  }
+  #approvalStatus:focus { outline: none; border-color: var(--blue); }
+  #approvalStatus.status-reviewed { border-color: #1565c0; background: #e3f2fd; color: #1565c0; font-weight: 600; }
+  #approvalStatus.status-approved { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+  #approvalStatus.status-rejected { border-color: var(--red); background: var(--red-light); color: var(--red); font-weight: 600; }
+
+  .approve-date-box {
+    background: var(--gray-50); border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius); padding: 0; overflow: hidden;
+  }
+  .approve-date-box-head {
+    background: var(--gray-200); padding: 5px 12px;
+    font-size: 10px; font-weight: 700; color: var(--gray-700);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .approve-date-box-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .ts-date-line { font-size: 14px; font-weight: 700; color: var(--navy); font-family: 'Courier New', monospace; }
+  .ts-time-line { font-size: 13px; font-weight: 600; color: var(--blue); font-family: 'Courier New', monospace; }
+  .ts-iso-line  { font-size: 10px; color: var(--gray-500); font-family: 'Courier New', monospace; }
+  .ts-empty     { font-size: 12px; color: var(--gray-300); font-style: italic; font-family: inherit; }
+  .approve-date-box.stamped { border-color: var(--green); }
+  .approve-date-box.stamped .approve-date-box-head { background: var(--green-light); color: var(--green); }
+
+  .manager-block {
+    background: var(--gray-50); border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 16px;
+  }
+  .manager-block-title {
+    font-size: 11px; font-weight: 700; color: var(--gray-500);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--gray-200);
+  }
+  .manager-row { display: grid; grid-template-columns: 200px 1fr auto; gap: 16px; align-items: start; }
+  .mgr-name-group { display: flex; flex-direction: column; gap: 5px; }
+  .mgr-name-group label { font-size: 11px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.4px; }
+  .mgr-name-combo { position: relative; }
+  .mgr-name-combo input {
+    border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    padding: 9px 36px 9px 12px; font-size: 13px; font-family: inherit;
+    width: 100%; background: white; transition: border-color 0.2s;
+  }
+  .mgr-name-combo input:focus { outline: none; border-color: var(--blue); }
+  .mgr-name-combo .combo-arrow-inner {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--gray-500); font-size: 12px; pointer-events: none;
+  }
+  .mgr-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: white; border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    box-shadow: var(--shadow-md); z-index: 50; display: none; max-height: 180px; overflow-y: auto;
+  }
+  .mgr-dropdown.open { display: block; }
+  .mgr-dropdown-item { padding: 9px 14px; font-size: 13px; cursor: pointer; transition: background 0.15s; }
+  .mgr-dropdown-item:hover { background: var(--blue-light); color: var(--blue); }
+
+  .mgr-sig-group { display: flex; flex-direction: column; gap: 5px; }
+  .mgr-sig-group label { font-size: 11px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.4px; }
+  .mgr-sig-wrap {
+    border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    overflow: hidden; background: white; position: relative; min-width: 220px;
+  }
+  .mgr-sig-canvas { display: block; width: 100%; height: 80px; cursor: crosshair; touch-action: none; }
+  .mgr-sig-placeholder {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    color: var(--gray-300); font-size: 12px; pointer-events: none; white-space: nowrap;
+  }
+  .mgr-ts-group { display: flex; flex-direction: column; gap: 5px; min-width: 160px; }
+  .mgr-ts-group label { font-size: 11px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.4px; }
+  .mgr-timestamp {
+    background: var(--gray-50); border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius); padding: 8px 12px; font-size: 12px;
+    font-family: 'Courier New', monospace; color: var(--gray-700); min-height: 40px;
+    display: flex; align-items: center;
+  }
+  .mgr-timestamp.filled { background: var(--green-light); border-color: #a5d6a7; color: var(--green); font-weight: 600; }
+  .btn-clr-sig {
+    padding: 6px 12px; background: none; border: 1.5px solid var(--gray-300);
+    border-radius: 5px; font-size: 11px; color: var(--gray-500); cursor: pointer;
+    transition: all 0.2s; white-space: nowrap; align-self: flex-end;
+  }
+  .btn-clr-sig:hover { border-color: var(--red); color: var(--red); }
+
+  .verified-section {
+    margin-top: 20px; padding: 16px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+    border: 2px solid #4caf50; border-radius: var(--radius-lg);
+  }
+  .verified-section p { font-size: 12px; color: var(--gray-700); margin-bottom: 12px; line-height: 1.6; }
+  .verified-section p strong { color: var(--navy); }
+  .export-targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .export-tag { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1.5px solid; }
+  .export-tag.xlsx { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; }
+  .export-tag.list { background: #e3f2fd; border-color: #1565c0; color: #0d47a1; }
+  .export-tag.done { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .btn-verified {
+    width: 100%; padding: 16px 32px;
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+    color: white; border: none; border-radius: var(--radius);
+    font-size: 16px; font-weight: 800; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.6px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 4px 12px rgba(30,90,40,0.25); text-transform: uppercase;
+  }
+  .btn-verified:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30,90,40,0.35); }
+  .btn-verified:disabled { background: var(--gray-300); cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-verified.done { background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%); }
+
+  .submit-section { margin-top: 24px; }
+  .btn-submit {
+    width: 100%; background: var(--navy); color: white; border: none;
+    border-radius: var(--radius); padding: 16px 32px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.4px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    position: relative; overflow: hidden;
+  }
+  .btn-submit:not(:disabled):hover { background: #1a3a6c; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .btn-submit:disabled { background: var(--gray-200); color: var(--gray-500); cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-lock-icon { font-size: 15px; }
+  .submit-lock-notice {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px; font-size: 12px; color: var(--gray-500);
+    text-align: center; margin-top: 6px; transition: opacity 0.3s;
+  }
+  .submit-lock-notice.hidden { opacity: 0; }
+
+  .success-screen { display: none; text-align: center; padding: 48px 24px; }
+  .success-screen.visible { display: block; }
+  .success-icon {
+    width: 72px; height: 72px; background: var(--green-light); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 32px;
+  }
+  .success-screen h2 { font-size: 22px; color: var(--navy); margin-bottom: 8px; }
+  .success-screen p { color: var(--gray-700); margin-bottom: 24px; }
+  .ref-number {
+    background: var(--blue-light); border: 1px solid #90caf9;
+    border-radius: var(--radius); padding: 12px 20px;
+    display: inline-block; font-size: 18px; font-weight: 700;
+    color: var(--blue); letter-spacing: 2px; margin-bottom: 24px;
+  }
+
+  .toast {
+    position: fixed; top: 80px; right: 16px;
+    background: var(--red); color: white;
+    padding: 12px 18px; border-radius: var(--radius); font-size: 13px;
+    font-weight: 600; z-index: 999; box-shadow: var(--shadow-lg);
+    transform: translateX(120%); transition: transform 0.3s ease; max-width: 300px;
+  }
+  .toast.show { transform: translateX(0); }
+  .toast.green { background: var(--green); }
+
+  .app-footer { text-align: center; padding: 20px; font-size: 11px; color: var(--gray-500); }
+
+  @media (max-width: 700px) {
+    .manager-row { grid-template-columns: 1fr; }
+    .approval-row { grid-template-columns: 1fr; }
+    .total-card-value { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">BE</div>
+      <div class="brand-text">
+        <h1>Bishman Electrical</h1>
+        <p>Weekly Timesheet Portal</p>
+      </div>
+    </div>
+    <div class="header-badge" id="weekLabel">Week Ending —</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<main class="main">
+<form id="timesheetForm" novalidate>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="icon">👤</div>Employee Details
+    </div>
+    <div class="card-body">
+      <div class="field-group">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="empName" placeholder="e.g. Amy Lee"
+                 required autocomplete="name" oninput="updateProgress()">
+        </div>
+        <div class="field">
+          <label>Employee Number</label>
+          <input type="text" id="empNumber" placeholder="e.g. 1311"
+                 required oninput="updateProgress()">
+        </div>
+        <div class="field">
+          <label>Week Ending <span class="req">*</span></label>
+          <input type="date" id="weekEnding" required onchange="updateWeekLabel(); updateProgress()">
+        </div>
+      </div>
+      <div class="field-group" style="grid-template-columns:1fr;margin-bottom:0">
+        <div class="field">
+          <label>Manager <span class="req">*</span>
+            <span style="font-size:10px;font-weight:400;color:var(--gray-500);text-transform:none;letter-spacing:0;margin-left:6px">
+              — from EmployeeList, or type manually
+            </span>
+          </label>
+          <div class="combo-wrap" id="mgrComboWrap">
+            <input type="text" id="mgrInput"
+                   placeholder="Search by name or employee no…"
+                   autocomplete="off"
+                   oninput="filterManagerDropdown()"
+                   onfocus="openManagerDropdown()"
+                   onblur="closeManagerDropdown()"
+                   onchange="updateProgress()">
+            <span class="combo-arrow" id="mgrComboArrow">▾</span>
+            <div class="combo-dropdown" id="mgrDropdown"></div>
+          </div>
+          <div class="mgr-selected-badge" id="mgrSelectedBadge">
+            <span>👤</span>
+            <span class="mgr-badge-name" id="mgrBadgeName"></span>
+            <span class="mgr-badge-role" id="mgrBadgeRole"></span>
+            <button type="button" class="mgr-badge-clear"
+                    onclick="clearManagerSelection()" title="Clear selection">✕</button>
+          </div>
+          <input type="hidden" id="mgrConfirmedName">
+          <input type="hidden" id="mgrConfirmedEmpNo">
+          <input type="hidden" id="mgrConfirmedRole">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header blue-header">
+      <div class="icon">⏱</div>
+      Breakdown of Jobs / Times
+      <span style="margin-left:auto;font-size:11px;opacity:0.8;font-weight:400">Decimal hours — e.g. 7.5 = 7h 30m</span>
+    </div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table class="time-table">
+          <thead>
+            <tr>
+              <th>Job / Description</th>
+              <th>Job Code</th>
+              <th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
+              <th>S</th><th>S</th>
+              <th>ORD</th><th>O/T</th><th>TOT</th>
+              <th style="width:24px"></th>
+            </tr>
+          </thead>
+          <tbody id="jobRows"></tbody>
+          <tbody id="leaveRows">
+            <tr class="leave-row">
+              <td class="row-label leave-label">Statutory Leave</td><td></td>
+              <td><input class="hour-input leave-input" data-leave="statutory" data-day="0" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="statutory" data-day="1" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="statutory" data-day="2" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="statutory" data-day="3" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="statutory" data-day="4" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input" disabled></td><td><input class="hour-input" disabled></td>
+              <td class="row-total" id="stat-ord">0</td><td></td>
+              <td class="row-total" id="stat-tot">0</td><td></td>
+            </tr>
+            <tr class="leave-row">
+              <td class="row-label leave-label">Annual Leave</td><td></td>
+              <td><input class="hour-input leave-input" data-leave="annual" data-day="0" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="annual" data-day="1" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="annual" data-day="2" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="annual" data-day="3" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="annual" data-day="4" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input" disabled></td><td><input class="hour-input" disabled></td>
+              <td class="row-total" id="annual-ord">0</td><td></td>
+              <td class="row-total" id="annual-tot">0</td><td></td>
+            </tr>
+            <tr class="leave-row">
+              <td class="row-label leave-label">Sick Leave</td><td></td>
+              <td><input class="hour-input leave-input" data-leave="sick" data-day="0" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="sick" data-day="1" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="sick" data-day="2" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="sick" data-day="3" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="sick" data-day="4" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input" disabled></td><td><input class="hour-input" disabled></td>
+              <td class="row-total" id="sick-ord">0</td><td></td>
+              <td class="row-total" id="sick-tot">0</td><td></td>
+            </tr>
+            <tr class="leave-row">
+              <td class="row-label leave-label">Block Course / Training</td><td></td>
+              <td><input class="hour-input leave-input" data-leave="training" data-day="0" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="training" data-day="1" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="training" data-day="2" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="training" data-day="3" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input leave-input" data-leave="training" data-day="4" type="number" min="0" max="24" step="0.5" placeholder="—"></td>
+              <td><input class="hour-input" disabled></td><td><input class="hour-input" disabled></td>
+              <td class="row-total" id="training-ord">0</td><td></td>
+              <td class="row-total" id="training-tot">0</td><td></td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr class="totals-row">
+              <td colspan="2" style="text-align:left;font-size:11px;letter-spacing:0.5px">DAILY TOTAL</td>
+              <td id="day-M">0</td><td id="day-T1">0</td><td id="day-W">0</td>
+              <td id="day-T2">0</td><td id="day-F">0</td>
+              <td id="day-S1">0</td><td id="day-S2">0</td>
+              <td id="grand-ord">0</td><td id="grand-ot">0</td><td id="grand-tot">0</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button" class="add-row-btn" onclick="addJobRow()">＋ Add another job / site</button>
+
+      <div class="ot-alert" id="otAlert">
+        ⚠ Overtime detected — hours above 8/day are highlighted red. Confirm with your manager.
+      </div>
+
+      <div class="totals-grid" style="margin-top:20px">
+        <div class="total-card ordinary">
+          <div class="total-card-label">Ordinary Hours</div>
+          <div class="total-card-value" id="summOrd">0.0</div>
+          <div class="total-card-sub">Regular pay</div>
+        </div>
+        <div class="total-card overtime">
+          <div class="total-card-label">Overtime Hours</div>
+          <div class="total-card-value" id="summOT">0.0</div>
+          <div class="total-card-sub">&gt;8h/day or 40h/wk</div>
+        </div>
+        <div class="total-card">
+          <div class="total-card-label">Leave Hours</div>
+          <div class="total-card-value" id="summLeave">0.0</div>
+          <div class="total-card-sub">All leave types</div>
+        </div>
+        <div class="total-card highlight">
+          <div class="total-card-label">Total Hours</div>
+          <div class="total-card-value" id="summTotal">0.0</div>
+          <div class="total-card-sub">This week</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="background:#795548">
+      <div class="icon">📋</div>Leave Type Selection
+    </div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--gray-700);margin-bottom:12px">
+        If no sick leave available, select one option:
+      </p>
+      <div class="sick-options">
+        <label class="sick-opt" id="opt-annual">
+          <input type="radio" name="sickOption" value="annual" onchange="setSickOpt(this)">
+          Deduct from Annual Leave
+        </label>
+        <label class="sick-opt" id="opt-lwp">
+          <input type="radio" name="sickOption" value="lwp" onchange="setSickOpt(this)">
+          Take as Leave Without Pay
+        </label>
+        <label class="sick-opt" id="opt-na">
+          <input type="radio" name="sickOption" value="na" checked onchange="setSickOpt(this)">
+          Not applicable
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header green-header">
+      <div class="icon">✍</div>Declaration &amp; Employee Signature
+    </div>
+    <div class="card-body">
+      <p style="font-size:13px;color:var(--gray-700);margin-bottom:16px;line-height:1.6">
+        I declare that the hours recorded above are true and correct to the best of my knowledge.
+      </p>
+      <div class="field-group">
+        <div class="field">
+          <label>Employee Signature <span class="req">*</span>
+            <span style="font-size:10px;color:var(--green);font-weight:700;text-transform:none;letter-spacing:0;margin-left:6px"
+                  id="sigConfirmedLabel" style="display:none">✓ Signed</span>
+          </label>
+          <div class="sig-wrap" id="sigWrap">
+            <canvas class="sig-canvas" id="sigCanvas" width="400" height="110"></canvas>
+            <div class="sig-placeholder" id="sigPlaceholder">Sign here with your finger or mouse</div>
+            <button type="button" class="sig-clear" onclick="clearEmpSig()">✕ Clear signature</button>
+          </div>
+          <div class="sig-required-note" id="sigRequiredNote">
+            <span>🔒</span>
+            <span>Your signature is required to enable the Submit button below</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Date Signed</label>
+          <input type="date" id="dateSigned" readonly>
+          <label style="margin-top:12px">Comments / Notes</label>
+          <textarea id="comments"
+            placeholder="Any additional notes for payroll or your manager…"
+            style="min-height:60px"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header dark-header">
+      <div class="icon">🔒</div>Office Use Only — Manager Section
+    </div>
+    <div class="card-body">
+      <div class="office-section">
+        <div>
+          <p style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;
+                    letter-spacing:0.5px;margin-bottom:10px">Payroll Allocation Codes</p>
+          <div class="office-codes">
+            <div class="office-field"><label>A14</label><input type="text" id="a14" placeholder="—"></div>
+            <div class="office-field"><label>00T A11</label><input type="text" id="oot_a11" placeholder="—"></div>
+            <div class="office-field"><label>00T A12</label><input type="text" id="oot_a12" placeholder="—"></div>
+            <div class="office-field"><label>202 CU</label><input type="text" id="cu202" placeholder="—"></div>
+            <div class="office-field"><label>205 CU</label><input type="text" id="cu205" placeholder="—"></div>
+          </div>
+        </div>
+
+        <div>
+          <p style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;
+                    letter-spacing:0.5px;margin-bottom:10px">Approval Status &amp; Date</p>
+          <div class="approval-row">
+            <div class="approval-status-group">
+              <label>Status</label>
+              <select id="approvalStatus" onchange="handleStatusChange(this)">
+                <option value="">🟡 Pending…</option>
+                <option value="reviewed">🔵 Reviewed</option>
+                <option value="approved">🟢 Approved</option>
+                <option value="rejected">🔴 Rejected</option>
+              </select>
+            </div>
+            <div class="approve-date-box" id="approveDateBox">
+              <div class="approve-date-box-head">
+                <span>Approval Date &amp; Timestamp</span>
+                <span id="approveStatusLabel" style="font-weight:400;font-size:10px">Auto-stamped on status change</span>
+              </div>
+              <div class="approve-date-box-body">
+                <div class="ts-empty" id="approveTs_empty">Not yet actioned</div>
+                <div id="approveTs_filled" style="display:none">
+                  <div class="ts-date-line" id="approveTs_date"></div>
+                  <div class="ts-time-line" id="approveTs_time"></div>
+                  <div class="ts-iso-line"  id="approveTs_iso"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="manager-block">
+          <div class="manager-block-title">Manager Authorisation</div>
+          <div class="manager-row">
+            <div class="mgr-name-group">
+              <label>Manager Name</label>
+              <div class="mgr-name-combo" id="mgrNameCombo">
+                <input type="text" id="mgrName" placeholder="Select or type name…"
+                  autocomplete="off"
+                  oninput="filterMgrDropdown()"
+                  onfocus="openMgrDropdown()"
+                  onblur="closeMgrDropdown()">
+                <span class="combo-arrow-inner">▾</span>
+                <div class="mgr-dropdown" id="mgrDropdown2">
+                  <div class="mgr-dropdown-item" onmousedown="selectMgr('Mike Tane')">Mike Tane</div>
+                  <div class="mgr-dropdown-item" onmousedown="selectMgr('Sarah Lee')">Sarah Lee</div>
+                  <div class="mgr-dropdown-item" onmousedown="selectMgr('James Hooper')">James Hooper</div>
+                  <div class="mgr-dropdown-item" onmousedown="selectMgr('Aroha Parata')">Aroha Parata</div>
+                  <div class="mgr-dropdown-item" onmousedown="selectMgr('David Chen')">David Chen</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mgr-sig-group">
+              <label>Manager Signature</label>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div class="mgr-sig-wrap">
+                  <canvas class="mgr-sig-canvas" id="mgrSigCanvas" width="400" height="80"></canvas>
+                  <div class="mgr-sig-placeholder" id="mgrSigPlaceholder">Sign here</div>
+                </div>
+                <button type="button" class="btn-clr-sig" onclick="clearMgrSig()">✕ Clear Signature</button>
+              </div>
+            </div>
+
+            <div class="mgr-ts-group">
+              <label>Signed At</label>
+              <div class="mgr-timestamp" id="mgrTimestamp">Awaiting signature…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="verified-section">
+          <p>
+            <strong>Ready to verify?</strong> Clicking <strong>Verify &amp; Export</strong>
+            will push this timesheet to all connected records:
+          </p>
+          <div class="export-targets">
+            <span class="export-tag xlsx">📊 Payroll_Master.xlsx</span>
+            <span class="export-tag xlsx">📊 JobCosting_Master.xlsx</span>
+            <span class="export-tag list">📋 Timesheet_Current (List)</span>
+            <span class="export-tag list">📋 Timesheet_2025 (Archive List)</span>
+            <span class="export-tag list">📋 Timesheet_Daily (List)</span>
+          </div>
+          <br>
+          <button type="button" class="btn-verified" id="btnVerified"
+                  onclick="handleVerify()" disabled>
+            ✓ &nbsp;VERIFY &amp; EXPORT TO ALL SYSTEMS
+          </button>
+          <p id="verifiedNote"
+             style="font-size:11px;color:var(--gray-500);margin-top:8px;text-align:center">
+            Manager must sign and set status to Approved or Reviewed before verifying.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-section">
+    <button type="submit" class="btn-submit" id="btnSubmit" disabled>
+      <span class="btn-lock-icon" id="btnLockIcon">🔒</span>
+      <span id="btnSubmitText">Sign above to enable submission</span>
+    </button>
+    <div class="submit-lock-notice" id="submitLockNotice">
+      Complete your signature in Section 4 to unlock this button
+    </div>
+  </div>
+
+</form>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>Timesheet Submitted!</h2>
+  <p>Your timesheet has been recorded. Reference number:</p>
+  <div class="ref-number" id="refNumber">—</div>
+  <p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">
+    A copy has been saved. Your manager will be notified for approval.
+  </p>
+  <button class="btn-submit" style="max-width:260px;margin:0 auto"
+          onclick="newTimesheet()" id="btnNewSheet">
+    ＋ Submit Another
+  </button>
+</div>
+</main>
+
+<footer class="app-footer">
+  Bishman Electrical Contractors · Timesheet v4.0 · Auckland, NZ<br>
+  No data leaves your device without submission · Built for portfolio demonstration
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   EMPLOYEE LIST
+═══════════════════════════════════════════════════════════════ */
+const EMPLOYEE_LIST = [
+  { empNo:'1001', name:'James Taumata',     role:'Project Manager',       department:'Commercial' },
+  { empNo:'1002', name:'Lisa Wong',          role:'Project Manager',       department:'Projects' },
+  { empNo:'1003', name:'David Parata',       role:'Site Manager',          department:'Industrial' },
+  { empNo:'1004', name:'Rachel Kim',         role:'Senior Project Manager',department:'Commercial' },
+  { empNo:'1005', name:'Chris Tuilagi',      role:'Project Manager',       department:'Residential' },
+  { empNo:'1006', name:'Mike Tane',          role:'Supervisor',            department:'Maintenance' },
+  { empNo:'1007', name:'Sarah Lee',          role:'Supervisor',            department:'Commercial' },
+  { empNo:'1008', name:'James Hooper',       role:'Site Supervisor',       department:'Projects' },
+  { empNo:'1009', name:'Aroha Parata',       role:'Team Leader',           department:'Residential' },
+  { empNo:'1010', name:'David Chen',         role:'Site Manager',          department:'Industrial' },
+  { empNo:'1611', name:'Jasee Wong',         role:'Electrician',           department:'Commercial' },
+  { empNo:'1612', name:'Te Koha Reweti',     role:'Electrician',           department:'Projects' },
+  { empNo:'1613', name:'Hemi Walker',        role:'Apprentice – Year 3',   department:'Residential' },
+  { empNo:'1614', name:'Mere Ngata',         role:'Apprentice – Year 2',   department:'Commercial' },
+  { empNo:'1615', name:'Faleolo Daniel',     role:'Electrician',           department:'Industrial' },
+  { empNo:'1616', name:'Aroha Taufa',        role:'Apprentice – Year 4',   department:'Commercial' },
+  { empNo:'1617', name:'Sam Mitchell',       role:'Electrician',           department:'Projects' },
+  { empNo:'1618', name:'Emily Chen',         role:'Estimator',             department:'Administration' },
+  { empNo:'1619', name:'Mark Parata',        role:'Electrician',           department:'Maintenance' },
+  { empNo:'1620', name:'Ngaio Taupo',        role:'Apprentice – Year 1',   department:'Residential' },
+];
+
+const MANAGERS = EMPLOYEE_LIST.filter(e =>
+  ['Project Manager','Senior Project Manager','Site Manager',
+   'Site Supervisor','Supervisor','Team Leader'].includes(e.role)
+);
+
+const OT_DAY = 8, OT_WEEK = 40;
+let jobRowCount = 0;
+let mgrHasSig   = false;
+let empHasSig   = false;
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT — Week Ending defaults to the coming Sunday (NZ)
+   ─────────────────────────────────────────────────────────────
+   Sunday = 0 in JS. Formula:
+     daysToSunday = (7 - today.getDay()) % 7
+   BUT if today IS Sunday, % 7 gives 0 (stay on today — correct,
+   since Sunday IS the week-ending day).
+   If today is any other day, it advances to the next Sunday.
+   A local date string is built manually to avoid UTC-offset
+   issues that can silently shift the date by ±1 day in NZ (UTC+12).
+═══════════════════════════════════════════════════════════════ */
+(function init() {
+  /* Use local wall-clock date so NZ users (UTC+12/13) always
+     see the correct day rather than UTC's previous day.       */
+  const now = new Date();
+  const localDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+
+  /* Days until next Sunday; 0 if today is already Sunday */
+  const daysToSunday = (7 - localDate.getDay()) % 7;
+  localDate.setDate(localDate.getDate() + daysToSunday);
+
+  /* Format as YYYY-MM-DD for the date input value */
+  const yyyy = localDate.getFullYear();
+  const mm   = String(localDate.getMonth() + 1).padStart(2, '0');
+  const dd   = String(localDate.getDate()).padStart(2, '0');
+
+  document.getElementById('weekEnding').value = `${yyyy}-${mm}-${dd}`;
+
+  updateWeekLabel();
+  addJobRow();
+  buildManagerDropdown('');
+  initEmpSig();
+  initMgrSig();
+  updateProgress();
+  lockSubmitButton();
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   WEEK LABEL
+═══════════════════════════════════════════════════════════════ */
+function updateWeekLabel() {
+  const v = document.getElementById('weekEnding').value;
+  if (!v) return;
+  const d = new Date(v + 'T00:00:00');
+  document.getElementById('weekLabel').textContent =
+    'Week Ending ' + d.toLocaleDateString('en-NZ', {day:'numeric', month:'short', year:'numeric'});
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MANAGER COMBO — Employee Details section
+═══════════════════════════════════════════════════════════════ */
+function buildManagerDropdown(query) {
+  const dd = document.getElementById('mgrDropdown');
+  const q  = query.toLowerCase().trim();
+  const results = q === ''
+    ? MANAGERS
+    : MANAGERS.filter(m =>
+        m.name.toLowerCase().includes(q) ||
+        m.empNo.includes(q) ||
+        m.role.toLowerCase().includes(q)
+      );
+
+  if (results.length === 0) {
+    dd.innerHTML = `<div class="combo-no-results">No match — you can still type the name manually</div>`;
+  } else {
+    dd.innerHTML = results.map(m => `
+      <div class="combo-item" onmousedown="selectManager('${m.empNo}')">
+        <span class="ci-name">${m.name} <span style="font-size:10px;color:var(--gray-500);font-weight:400">#${m.empNo}</span></span>
+        <span class="ci-role">${m.role} · ${m.department}</span>
+      </div>`).join('');
+  }
+}
+
+function filterManagerDropdown() {
+  buildManagerDropdown(document.getElementById('mgrInput').value);
+  openManagerDropdown();
+}
+function openManagerDropdown() {
+  document.getElementById('mgrDropdown').classList.add('open');
+  document.getElementById('mgrComboArrow').classList.add('open');
+}
+function closeManagerDropdown() {
+  setTimeout(() => {
+    document.getElementById('mgrDropdown').classList.remove('open');
+    document.getElementById('mgrComboArrow').classList.remove('open');
+  }, 180);
+}
+function selectManager(empNo) {
+  const m = MANAGERS.find(x => x.empNo === empNo);
+  if (!m) return;
+  document.getElementById('mgrInput').value          = m.name;
+  document.getElementById('mgrConfirmedName').value  = m.name;
+  document.getElementById('mgrConfirmedEmpNo').value = m.empNo;
+  document.getElementById('mgrConfirmedRole').value  = m.role;
+  document.getElementById('mgrBadgeName').textContent = m.name + ' #' + m.empNo;
+  document.getElementById('mgrBadgeRole').textContent = m.role + ' · ' + m.department;
+  document.getElementById('mgrSelectedBadge').classList.add('show');
+  closeManagerDropdown();
+  updateProgress();
+}
+function clearManagerSelection() {
+  document.getElementById('mgrInput').value          = '';
+  document.getElementById('mgrConfirmedName').value  = '';
+  document.getElementById('mgrConfirmedEmpNo').value = '';
+  document.getElementById('mgrConfirmedRole').value  = '';
+  document.getElementById('mgrSelectedBadge').classList.remove('show');
+  buildManagerDropdown('');
+  updateProgress();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OFFICE USE — Manager name combo
+═══════════════════════════════════════════════════════════════ */
+function openMgrDropdown()  { document.getElementById('mgrDropdown2').classList.add('open'); }
+function closeMgrDropdown() { setTimeout(()=>document.getElementById('mgrDropdown2').classList.remove('open'), 150); }
+function filterMgrDropdown() {
+  const val = document.getElementById('mgrName').value.toLowerCase();
+  document.querySelectorAll('#mgrDropdown2 .mgr-dropdown-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(val) ? '' : 'none';
+  });
+  openMgrDropdown();
+}
+function selectMgr(name) {
+  document.getElementById('mgrName').value = name;
+  document.getElementById('mgrDropdown2').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   JOB ROWS
+═══════════════════════════════════════════════════════════════ */
+function addJobRow(desc='', code='') {
+  jobRowCount++;
+  const id = 'job' + jobRowCount;
+  const tr = document.createElement('tr');
+  tr.id = id;
+  tr.innerHTML = `
+    <td><input class="job-input" type="text" placeholder="Job / site description"
+      value="${desc}" oninput="recalc()"></td>
+    <td><input class="job-input" type="text" placeholder="Code" style="width:76px"
+      value="${code}" oninput="recalc()"></td>
+    ${[0,1,2,3,4,5,6].map(d => `
+      <td><input class="hour-input" type="number" min="0" max="24" step="0.5"
+        data-row="${id}" data-day="${d}" placeholder="—"
+        oninput="recalc()" onfocus="this.select()"></td>`).join('')}
+    <td class="row-total"              id="${id}-ord">0</td>
+    <td class="row-total overtime-val" id="${id}-ot">0</td>
+    <td class="row-total"              id="${id}-tot">0</td>
+    <td><button type="button"
+      style="border:none;background:none;color:var(--gray-300);cursor:pointer;font-size:15px;padding:4px"
+      title="Remove row" onclick="removeRow('${id}')">✕</button></td>`;
+  document.getElementById('jobRows').appendChild(tr);
+  recalc();
+}
+
+function removeRow(id) {
+  const el = document.getElementById(id);
+  if (el) { el.remove(); recalc(); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CALCULATIONS
+═══════════════════════════════════════════════════════════════ */
+function n(el)   { return parseFloat(el.value) || 0; }
+function fmt(v)  { return v % 1 === 0 ? v.toFixed(0) : v.toFixed(1); }
+function sc(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+
+function recalc() {
+  const dayTotals = [0,0,0,0,0,0,0];
+  let grandOrd=0, grandOT=0, grandTot=0;
+
+  document.querySelectorAll('#jobRows tr').forEach(tr => {
+    const id = tr.id;
+    const inputs = tr.querySelectorAll('input.hour-input');
+    let rowOrd=0, rowOT=0;
+    inputs.forEach((inp, d) => {
+      const h = n(inp);
+      const ord = Math.min(h, OT_DAY), ot = Math.max(0, h - OT_DAY);
+      rowOrd += ord; rowOT += ot;
+      dayTotals[d] += h;
+      inp.classList.toggle('overtime', ot > 0);
+    });
+    const tot = rowOrd + rowOT;
+    sc(id+'-ord', fmt(rowOrd));
+    sc(id+'-ot',  fmt(rowOT));
+    sc(id+'-tot', fmt(tot));
+    grandOrd += rowOrd; grandOT += rowOT; grandTot += tot;
+  });
+
+  let totalLeave = 0;
+  ['statutory','annual','sick','training'].forEach(type => {
+    let sum = 0;
+    document.querySelectorAll(`.leave-input[data-leave="${type}"]`).forEach(i => sum += n(i));
+    totalLeave += sum;
+    sc(type+'-ord', fmt(sum));
+    sc(type+'-tot', fmt(sum));
+    grandOrd += sum; grandTot += sum;
+  });
+
+  ['day-M','day-T1','day-W','day-T2','day-F','day-S1','day-S2'].forEach((id,i) =>
+    sc(id, fmt(dayTotals[i])));
+
+  sc('grand-ord', fmt(grandOrd));
+  sc('grand-ot',  fmt(grandOT));
+  sc('grand-tot', fmt(grandTot));
+
+  const workOrd = grandOrd - totalLeave;
+  const weekOT  = Math.max(0, workOrd - OT_WEEK);
+  document.getElementById('summOrd').textContent   = fmt(workOrd - weekOT);
+  document.getElementById('summOT').textContent    = fmt(grandOT + weekOT);
+  document.getElementById('summLeave').textContent = fmt(totalLeave);
+  document.getElementById('summTotal').textContent = fmt(grandTot);
+  document.getElementById('otAlert').classList.toggle('visible', grandOT + weekOT > 0);
+  updateProgress();
+}
+
+document.querySelectorAll('.leave-input').forEach(inp => inp.addEventListener('input', recalc));
+
+function setSickOpt(radio) {
+  document.querySelectorAll('.sick-opt').forEach(el => el.classList.remove('selected'));
+  radio.closest('.sick-opt').classList.add('selected');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EMPLOYEE SIGNATURE PAD
+═══════════════════════════════════════════════════════════════ */
+function initEmpSig() {
+  const canvas = document.getElementById('sigCanvas');
+  const ctx    = canvas.getContext('2d');
+  const ph     = document.getElementById('sigPlaceholder');
+  let drawing  = false;
+
+  function resize() {
+    const ratio = Math.max(window.devicePixelRatio||1, 1);
+    const r = canvas.getBoundingClientRect();
+    canvas.width  = r.width  * ratio;
+    canvas.height = r.height * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.strokeStyle = '#0d2c54';
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+  }
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const s = e.touches ? e.touches[0] : e;
+    return { x: s.clientX - r.left, y: s.clientY - r.top };
+  }
+  function start(e) {
+    e.preventDefault(); drawing = true;
+    const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    ph.style.display = 'none';
+  }
+  function move(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+  }
+  function end() {
+    drawing = false;
+    if (!empHasSig) { empHasSig = true; onSignatureDrawn(); }
+  }
+
+  canvas.addEventListener('mousedown',  start);
+  canvas.addEventListener('mousemove',  move);
+  canvas.addEventListener('mouseup',    end);
+  canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove',  move,  { passive: false });
+  canvas.addEventListener('touchend',   end);
+  window.addEventListener('resize', resize);
+  resize();
+}
+
+function onSignatureDrawn() {
+  document.getElementById('sigWrap').classList.add('has-sig');
+  document.getElementById('sigRequiredNote').classList.add('hidden');
+  document.getElementById('sigConfirmedLabel').style.display = 'inline';
+
+  /* Auto-fill Date Signed with today's local date */
+  const today = new Date();
+  const yyyy  = today.getFullYear();
+  const mm    = String(today.getMonth() + 1).padStart(2, '0');
+  const dd    = String(today.getDate()).padStart(2, '0');
+  document.getElementById('dateSigned').value = `${yyyy}-${mm}-${dd}`;
+
+  unlockSubmitButton();
+  updateProgress();
+}
+
+function clearEmpSig() {
+  const canvas = document.getElementById('sigCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('sigPlaceholder').style.display = '';
+  document.getElementById('sigWrap').classList.remove('has-sig');
+  document.getElementById('sigRequiredNote').classList.remove('hidden');
+  document.getElementById('sigConfirmedLabel').style.display = 'none';
+  document.getElementById('dateSigned').value = '';
+  empHasSig = false;
+  lockSubmitButton();
+  updateProgress();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUBMIT BUTTON LOCK / UNLOCK
+═══════════════════════════════════════════════════════════════ */
+function lockSubmitButton() {
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnLockIcon').textContent   = '🔒';
+  document.getElementById('btnSubmitText').textContent = 'Sign above to enable submission';
+  document.getElementById('submitLockNotice').classList.remove('hidden');
+}
+function unlockSubmitButton() {
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnLockIcon').textContent   = '✓';
+  document.getElementById('btnSubmitText').textContent = 'Submit Timesheet';
+  document.getElementById('submitLockNotice').classList.add('hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MANAGER SIGNATURE
+═══════════════════════════════════════════════════════════════ */
+function initMgrSig() {
+  const canvas = document.getElementById('mgrSigCanvas');
+  const ctx    = canvas.getContext('2d');
+  const ph     = document.getElementById('mgrSigPlaceholder');
+  let drawing  = false;
+
+  function resize() {
+    const ratio = Math.max(window.devicePixelRatio||1, 1);
+    const r = canvas.getBoundingClientRect();
+    canvas.width  = r.width  * ratio;
+    canvas.height = r.height * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.strokeStyle = '#0d2c54';
+    ctx.lineWidth   = 2.2;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+  }
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const s = e.touches ? e.touches[0] : e;
+    return { x: s.clientX - r.left, y: s.clientY - r.top };
+  }
+  function start(e) {
+    e.preventDefault(); drawing = true;
+    const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    ph.style.display = 'none';
+  }
+  function move(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+  }
+  function end() {
+    drawing = false;
+    if (!mgrHasSig) { mgrHasSig = true; stampMgrTimestamp(); updateVerifyButton(); }
+  }
+
+  canvas.addEventListener('mousedown',  start);
+  canvas.addEventListener('mousemove',  move);
+  canvas.addEventListener('mouseup',    end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove',  move,  { passive: false });
+  canvas.addEventListener('touchend',   end);
+  window.addEventListener('resize', resize);
+  resize();
+}
+
+function stampMgrTimestamp() {
+  const now = new Date();
+  const ts  = now.toLocaleString('en-NZ', {
+    day:'2-digit', month:'short', year:'numeric',
+    hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false
+  });
+  const el = document.getElementById('mgrTimestamp');
+  el.textContent = ts;
+  el.classList.add('filled');
+  window._mgrTimestamp = now.toISOString();
+}
+
+function clearMgrSig() {
+  const canvas = document.getElementById('mgrSigCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('mgrSigPlaceholder').style.display = '';
+  mgrHasSig = false;
+  const el = document.getElementById('mgrTimestamp');
+  el.textContent = 'Awaiting signature…';
+  el.classList.remove('filled');
+  window._mgrTimestamp = null;
+  updateVerifyButton();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APPROVAL STATUS + TIMESTAMP
+═══════════════════════════════════════════════════════════════ */
+function handleStatusChange(sel) {
+  sel.className = '';
+  const v = sel.value;
+  if (v) sel.classList.add('status-' + v);
+
+  const box       = document.getElementById('approveDateBox');
+  const emptyEl   = document.getElementById('approveTs_empty');
+  const filledEl  = document.getElementById('approveTs_filled');
+  const statusLbl = document.getElementById('approveStatusLabel');
+
+  if (v === 'approved' || v === 'reviewed' || v === 'rejected') {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-NZ', {
+      weekday:'long', day:'2-digit', month:'long', year:'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('en-NZ', {
+      hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false,
+      timeZoneName:'short'
+    });
+    const isoStr = now.toISOString();
+    document.getElementById('approveTs_date').textContent = dateStr;
+    document.getElementById('approveTs_time').textContent = timeStr;
+    document.getElementById('approveTs_iso').textContent  = isoStr;
+    emptyEl.style.display  = 'none';
+    filledEl.style.display = 'block';
+    box.classList.add('stamped');
+    const colours = { approved:'var(--green)', reviewed:'var(--blue)', rejected:'var(--red)' };
+    document.getElementById('approveTs_date').style.color = colours[v] || 'var(--navy)';
+    document.getElementById('approveTs_time').style.color = colours[v] || 'var(--blue)';
+    statusLbl.textContent = '✓ Stamped ' + timeStr;
+    statusLbl.style.color = colours[v];
+    window._approveTimestamp = isoStr;
+  } else {
+    emptyEl.style.display  = 'block';
+    filledEl.style.display = 'none';
+    box.classList.remove('stamped');
+    statusLbl.textContent = 'Auto-stamped on status change';
+    statusLbl.style.color = '';
+    window._approveTimestamp = null;
+  }
+  updateVerifyButton();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VERIFY BUTTON
+═══════════════════════════════════════════════════════════════ */
+function updateVerifyButton() {
+  const status   = document.getElementById('approvalStatus').value;
+  const canVerify = mgrHasSig && (status === 'approved' || status === 'reviewed');
+  document.getElementById('btnVerified').disabled = !canVerify;
+  document.getElementById('verifiedNote').textContent = canVerify
+    ? 'Ready — click to push data to all connected systems.'
+    : 'Manager must sign and set status to Approved or Reviewed before verifying.';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HANDLE VERIFY
+═══════════════════════════════════════════════════════════════ */
+async function handleVerify() {
+  const btn = document.getElementById('btnVerified');
+  btn.disabled = true;
+  btn.textContent = '⏳  Exporting…';
+  const data = collectData();
+  exportPayrollCSV(data, 'Payroll_Master');
+  await delay(600);
+  exportJobCostingCSV(data, 'JobCosting_Master');
+  await delay(400);
+  pushToList('Timesheet_Current', data);
+  pushToList('Timesheet_' + data.weekEnding.substring(0,4), data);
+  pushToList('Timesheet_Daily', data);
+  btn.textContent = '✓  Verified & Exported';
+  btn.className   = 'btn-verified done';
+  showToast('✓ Exported to all 5 targets', 3000, true);
+  document.querySelectorAll('.export-tag').forEach(t => t.classList.add('done'));
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPORTS
+═══════════════════════════════════════════════════════════════ */
+function exportPayrollCSV(data, filename) {
+  const headers = [
+    'Ref','WeekEnding','EmpName','EmpNumber','Manager','ManagerEmpNo',
+    'JobDesc','JobCode','Mon','Tue','Wed','Thu','Fri','Sat','Sun',
+    'OrdHrs','OTHrs','RowTotal','TotalOrd','TotalOT','LeaveHrs','GrandTotal',
+    'SickOption','MgrName','ApprovalStatus','ApproveDate','ApproveTimestamp',
+    'MgrSignedAt','Comments','A14','00T_A11','00T_A12','202CU','205CU'
+  ];
+  const rows = [headers];
+  data.jobs.forEach(j => {
+    rows.push([
+      data.refNumber, data.weekEnding,
+      data.employee.name, data.employee.number,
+      data.employee.manager, data.employee.managerEmpNo,
+      j.description, j.jobCode,
+      j.mon, j.tue, j.wed, j.thu, j.fri, j.sat, j.sun,
+      j.ordHours, j.otHours, j.total,
+      data.totals.ordinary, data.totals.overtime, data.totals.leave, data.totals.total,
+      data.leave.sickOption,
+      data.officeUse.mgrName, data.officeUse.approvalStatus,
+      data.officeUse.approveDate, data.officeUse.approveTimestamp,
+      data.officeUse.mgrSignedAt, data.comments,
+      data.officeUse.a14, data.officeUse.oot_a11, data.officeUse.oot_a12,
+      data.officeUse.cu202, data.officeUse.cu205
+    ]);
+  });
+  downloadCSV(rows, filename + '_' + data.weekEnding + '.csv');
+}
+
+function exportJobCostingCSV(data, filename) {
+  const headers = [
+    'Ref','WeekEnding','EmpName','EmpNumber','Manager',
+    'JobDesc','JobCode','Mon','Tue','Wed','Thu','Fri','Sat','Sun',
+    'OrdHrs','OTHrs','RowTotal','ApprovalStatus','MgrName','VerifiedAt'
+  ];
+  const rows = [headers];
+  data.jobs.forEach(j => {
+    rows.push([
+      data.refNumber, data.weekEnding, data.employee.name, data.employee.number,
+      data.employee.manager,
+      j.description, j.jobCode,
+      j.mon, j.tue, j.wed, j.thu, j.fri, j.sat, j.sun,
+      j.ordHours, j.otHours, j.total,
+      data.officeUse.approvalStatus, data.officeUse.mgrName,
+      new Date().toISOString()
+    ]);
+  });
+  downloadCSV(rows, filename + '_' + data.weekEnding + '.csv');
+}
+
+function downloadCSV(rows, filename) {
+  const csv  = rows.map(r =>
+    r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function pushToList(listName, data) {
+  const key      = 'list_' + listName;
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  data.jobs.forEach(j => {
+    existing.push({
+      ref: data.refNumber, weekEnding: data.weekEnding,
+      empName: data.employee.name, empNumber: data.employee.number,
+      manager: data.employee.manager,
+      jobDesc: j.description, jobCode: j.jobCode,
+      mon:j.mon, tue:j.tue, wed:j.wed, thu:j.thu,
+      fri:j.fri, sat:j.sat, sun:j.sun,
+      ordHrs:j.ordHours, otHrs:j.otHours, total:j.total,
+      totalOrd:data.totals.ordinary, totalOT:data.totals.overtime,
+      grandTotal:data.totals.total,
+      mgrName:data.officeUse.mgrName, status:data.officeUse.approvalStatus,
+      approveDate: data.officeUse.approveDate,
+      approveTs:data.officeUse.approveTimestamp,
+      mgrSigTs:data.officeUse.mgrSignedAt,
+      verifiedAt:new Date().toISOString()
+    });
+  });
+  localStorage.setItem(key, JSON.stringify(existing));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COLLECT DATA
+═══════════════════════════════════════════════════════════════ */
+function collectData() {
+  const jobs = [];
+  document.querySelectorAll('#jobRows tr').forEach(tr => {
+    const inputs    = tr.querySelectorAll('input.hour-input');
+    const jobInputs = tr.querySelectorAll('input.job-input');
+    const hours     = Array.from(inputs).map(i => parseFloat(i.value)||0);
+    if (hours.some(h => h > 0) || (jobInputs[0] && jobInputs[0].value.trim())) {
+      jobs.push({
+        description: jobInputs[0]?.value||'',
+        jobCode:     jobInputs[1]?.value||'',
+        mon:hours[0], tue:hours[1], wed:hours[2], thu:hours[3],
+        fri:hours[4], sat:hours[5], sun:hours[6],
+        ordHours: parseFloat(document.getElementById(tr.id+'-ord')?.textContent)||0,
+        otHours:  parseFloat(document.getElementById(tr.id+'-ot')?.textContent)||0,
+        total:    parseFloat(document.getElementById(tr.id+'-tot')?.textContent)||0,
+      });
+    }
+  });
+
+  const approveTs   = window._approveTimestamp || '';
+  const approveDate = approveTs ? approveTs.split('T')[0] : '';
+
+  return {
+    submittedAt: new Date().toISOString(),
+    refNumber:   generateRef(),
+    employee: {
+      name:         document.getElementById('empName').value,
+      number:       document.getElementById('empNumber').value,
+      manager:      document.getElementById('mgrConfirmedName').value ||
+                    document.getElementById('mgrInput').value,
+      managerEmpNo: document.getElementById('mgrConfirmedEmpNo').value,
+      managerRole:  document.getElementById('mgrConfirmedRole').value,
+    },
+    weekEnding: document.getElementById('weekEnding').value,
+    jobs,
+    leave: {
+      statutory: sumLeave('statutory'),
+      annual:    sumLeave('annual'),
+      sick:      sumLeave('sick'),
+      training:  sumLeave('training'),
+      sickOption: document.querySelector('[name=sickOption]:checked')?.value,
+    },
+    totals: {
+      ordinary: document.getElementById('summOrd').textContent,
+      overtime: document.getElementById('summOT').textContent,
+      leave:    document.getElementById('summLeave').textContent,
+      total:    document.getElementById('summTotal').textContent,
+    },
+    empSignature: document.getElementById('sigCanvas').toDataURL(),
+    mgrSignature: document.getElementById('mgrSigCanvas').toDataURL(),
+    dateSigned:   document.getElementById('dateSigned').value,
+    comments:     document.getElementById('comments').value,
+    officeUse: {
+      a14:     document.getElementById('a14').value,
+      oot_a11: document.getElementById('oot_a11').value,
+      oot_a12: document.getElementById('oot_a12').value,
+      cu202:   document.getElementById('cu202').value,
+      cu205:   document.getElementById('cu205').value,
+      mgrName:          document.getElementById('mgrName').value,
+      approvalStatus:   document.getElementById('approvalStatus').value,
+      approveDate,
+      approveTimestamp: approveTs,
+      mgrSignedAt:      window._mgrTimestamp || '',
+    }
+  };
+}
+
+function sumLeave(type) {
+  let s = 0;
+  document.querySelectorAll(`.leave-input[data-leave="${type}"]`).forEach(i => s += parseFloat(i.value)||0);
+  return s;
+}
+
+function generateRef() {
+  const d = new Date();
+  return 'TS-' + d.getFullYear() +
+    String(d.getMonth()+1).padStart(2,'0') +
+    String(d.getDate()).padStart(2,'0') + '-' +
+    Math.random().toString(36).substring(2,6).toUpperCase();
+}
+
+function formatNZDateTime(isoString) {
+  const d = new Date(isoString);
+  const dd   = String(d.getDate()).padStart(2, '0');
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const hh   = String(d.getHours()).padStart(2, '0');
+  const min  = String(d.getMinutes()).padStart(2, '0');
+  const ss   = String(d.getSeconds()).padStart(2, '0');
+  return `${dd}-${mm}-${yyyy} ${hh}:${min}:${ss}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════════════════════════ */
+function updateProgress() {
+  const fields = ['empName','empNumber','weekEnding'];
+  let filled = fields.filter(id => document.getElementById(id).value.trim()).length;
+  if (document.getElementById('mgrInput').value.trim()) filled++;
+  if (empHasSig) filled++;
+  document.getElementById('progressFill').style.width =
+    Math.round((filled / (fields.length + 2)) * 100) + '%';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VALIDATION
+═══════════════════════════════════════════════════════════════ */
+function validate() {
+  const required = [
+    { id:'empName',    label:'Full Name' },
+    { id:'weekEnding', label:'Week Ending Date' },
+    { id:'mgrInput',   label:'Manager' },
+  ];
+  for (const f of required) {
+    const el = document.getElementById(f.id);
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      showToast('Please fill in: ' + f.label);
+      el.scrollIntoView({ behavior:'smooth', block:'center' });
+      el.focus();
+      setTimeout(() => el.classList.remove('error'), 2000);
+      return false;
+    }
+  }
+  if (!empHasSig) {
+    showToast('Please add your signature before submitting');
+    document.getElementById('sigCanvas').scrollIntoView({ behavior:'smooth', block:'center' });
+    return false;
+  }
+  const total = parseFloat(document.getElementById('summTotal').textContent) || 0;
+  if (total === 0) {
+    showToast('No hours entered — please fill in your work hours');
+    return false;
+  }
+  return true;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════ */
+function showToast(msg, duration=3000, green=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast show' + (green ? ' green' : '');
+  setTimeout(() => t.className = 'toast', duration);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUBMIT
+═══════════════════════════════════════════════════════════════ */
+/* DELETE document.getElementById('timesheetForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!validate()) return;
+  const data = collectData();
+
+  const all = JSON.parse(localStorage.getItem('ts_submissions') || '[]');
+  all.push(data);
+  localStorage.setItem('ts_submissions', JSON.stringify(all));
+
+  downloadCSV(
+    [['Ref','EmpName','EmpNumber','Manager','WeekEnding','TotalHrs','OTHrs','SubmittedAt'],
+     [data.refNumber, data.employee.name, data.employee.number,
+      data.employee.manager, data.weekEnding,
+      data.totals.total, data.totals.overtime, formatNZDateTime(data.submittedAt)]],
+    `timesheet_${data.employee.name.replace(/\s/g,'_')}_${data.weekEnding}.csv`
+  );
+
+  document.getElementById('timesheetForm').style.display = 'none';
+  document.getElementById('successScreen').classList.add('visible');
+  document.getElementById('refNumber').textContent = data.refNumber;
+  window.scrollTo({ top:0, behavior:'smooth' });
+}); DELETED */
+
+
+// ═══════════════════════════════════════════════════════════
+//  CONFIGURATION — paste your Power Automate URL here
+// ═══════════════════════════════════════════════════════════
+const POWER_AUTOMATE_URL = 'PASTE_YOUR_FLOW_URL_HERE';
+ 
+// ═══════════════════════════════════════════════════════════
+//  SUBMIT HANDLER
+// ═══════════════════════════════════════════════════════════
+document.getElementById('timesheetForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!validate()) return;
+ 
+  const data = collectData();
+ 
+  // 1. Save locally as before (backup)
+  const all = JSON.parse(localStorage.getItem('ts_submissions') || '[]');
+  all.push(data);
+  localStorage.setItem('ts_submissions', JSON.stringify(all));
+ 
+  // 2. Download CSV as before (offline backup)
+  downloadCSV([
+    ['Ref','EmpName','Manager','WeekEnding','TotalHrs','OTHrs','SubmittedAt'],
+    [data.refNumber, data.employee.name, data.employee.manager,
+     data.weekEnding, data.totals.total, data.totals.overtime,
+     formatNZDateTime(data.submittedAt)]
+  ], `timesheet_${data.employee.name.replace(/\s/g,'_')}_${data.weekEnding}.csv`);
+ 
+  // 3. Send to Power Automate (SharePoint backend)
+  const submitBtn = document.querySelector('button[type=submit]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting to Server…';
+ 
+  try {
+    const payload = buildPayload(data);
+    const resp = await fetch(POWER_AUTOMATE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error('Server returned ' + resp.status);
+ 
+    // Success
+    document.getElementById('timesheetForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+    document.getElementById('refNumber').textContent = data.refNumber;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+ 
+  } catch (err) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = '📤 Submit Timesheet';
+    showToast('⚠️ Could not reach server — your CSV was downloaded. Please email it to your manager.');
+    console.error('Submission error:', err);
+  }
+});
+ 
+// ═══════════════════════════════════════════════════════════
+//  BUILD PAYLOAD — flat object for Power Automate
+// ═══════════════════════════════════════════════════════════
+function buildPayload(data) {
+  // Collect first job row (primary job for costing master)
+  const primaryJob = data.jobs && data.jobs.length > 0 ? data.jobs[0] : {};
+  return {
+    timesheetID:   data.refNumber,
+    employeeID:    data.employee.number || '',
+    employeeName:  data.employee.name,
+    weekEnding:    data.weekEnding,
+    submittedAt:   formatNZDateTime(data.submittedAt),
+    manager:       data.employee.manager,
+    totalHours:    String(data.totals.total),
+    overtimeHours: String(data.totals.overtime),
+    regularHours:  String(data.totals.ordinary),
+    jobNumber:     primaryJob.jobCode || '',
+    projectName:   primaryJob.description || '',
+    // Encoded HTML for archiving (strip signature images to reduce size)
+    formHTML: document.documentElement.outerHTML
+      .replace(/data:image\/png;base64,[^"']*/g, '[SIGNATURE_REMOVED]')
+  };
+}
+
+
+function newTimesheet() { location.reload(); }
+</script>
+</body>
+</html>
